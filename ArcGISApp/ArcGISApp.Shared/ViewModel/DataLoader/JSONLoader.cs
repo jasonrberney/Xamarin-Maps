@@ -9,16 +9,16 @@ using System.Reflection;
 using System.Text;
 using Newtonsoft.Json;
 
-namespace ArcGISApp.ViewModel.DataLoader
+namespace ArcGISApp
 {
     public class JSONLoader
     {
         public List<Bar> bars;
 
-        public void LoadJSON()
+        public JSONLoader()
         {
             var assembly = typeof(JSONLoader).GetTypeInfo().Assembly;
-            Stream stream = assembly.GetManifestResourceStream("ViewModel.DataLoader.bars_in_WA.json");
+            Stream stream = assembly.GetManifestResourceStream("ArcGISApp.Data.bars_in_WA.json");
 
             using (var reader = new System.IO.StreamReader(stream))
             {

@@ -15,6 +15,7 @@
       <DependentUpon>MapPage.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModel\DataLoader\JSONLoader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModel\Map\BasemapSelector.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -22,5 +23,9 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Data\bars_in_WA.json" />
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Data\beer_mug.png" />
   </ItemGroup>
 </Project>

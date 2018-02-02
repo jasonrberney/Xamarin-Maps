@@ -2,7 +2,10 @@
 using Esri.ArcGISRuntime.Mapping;
 using Esri.ArcGISRuntime.Symbology;
 using Esri.ArcGISRuntime.UI;
+using Esri.ArcGISRuntime.Xamarin.Forms;
+//using Esri.ArcGISRuntime.UI.Controls;
 using System;
+using System.Reflection;
 using Xamarin.Forms;
 //using Windows.UI;
 
@@ -17,11 +20,13 @@ namespace ArcGISApp
 	public partial class MapPage : ContentPage
     {
         private BasemapSelector basemapSelector;
+        private GraphicsOverlay overlay;
         public MapPage()
         {
             InitializeComponent();
             Initialize();
             basemapSelector = new BasemapSelector(MyMapView);
+            layerLoad(MyMapView);
         }
         // String array to store titles for the viewpoints specified above.
         private string[] titles = new string[]
@@ -63,6 +68,41 @@ namespace ArcGISApp
             // Add a new graphic with a central point that was created earlier
             Graphic graphicWithSymbol = new Graphic(centralLocation, simpleSymbol);
             overlay.Graphics.Add(graphicWithSymbol);
+        }
+
+        public async void layerLoad(MapView myMapView)
+        {
+            overlay = new GraphicsOverlay();
+            myMapView.GraphicsOverlays.Add(overlay);
+
+            Assembly currentAssembly = null;
+
+#if WINDOWS_UWP
+            // Get current assembly that contains the image
+            currentAssembly = GetType().GetTypeInfo().Assembly;
+#else
+            // Get current assembly that contains the image
+            currentAssembly = Assembly.GetExecutingAssembly();
+#endif
+
+            // Get image as a stream from the resources
+            // Picture is defined as EmbeddedResource and DoNotCopy
+            var beerMug = currentAssembly.GetManifestResourceStream("ArcGISApp.images.beer_mug.png");
+
+            PictureMarkerSymbol beer = await PictureMarkerSymbol.CreateAsync(beerMug);
+            ArcGISApp.JSONLoader loader = new ArcGISApp.JSONLoader();
+
+            if(loader.bars.Count > 0)
+            {
+                MapPoint mp;
+                Graphic graphic;
+                foreach (Bar b in loader.bars)
+                {
+                    mp = b.getMapPoint();
+                    graphic = new Graphic(mp, beer);
+                    overlay.Graphics.Add(graphic);
+                }
+            }
         }
 
         private async void OnChangeBasemapButtonClicked(object sender, EventArgs e)
