@@ -50,5 +50,15 @@ namespace ArcGISApp
 
             return Esri.ArcGISRuntime.Geometry.CoordinateFormatter.FromLatitudeLongitude(lat + "," + lon, wgs84);
         }
+        public string toJson()
+        {
+            return JsonConvert.SerializeObject(this);
+        }
+        public Dictionary<string, object> getAttributes()
+        {
+            var dictionary = JsonConvert.DeserializeObject<Dictionary<string, object>>(this.toJson());
+
+            return dictionary;
+        }
     }
 }

@@ -5,6 +5,7 @@ using Esri.ArcGISRuntime.UI;
 using Esri.ArcGISRuntime.Xamarin.Forms;
 //using Esri.ArcGISRuntime.UI.Controls;
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using Xamarin.Forms;
 //using Windows.UI;
@@ -100,6 +101,14 @@ namespace ArcGISApp
                 {
                     mp = b.getMapPoint();
                     graphic = new Graphic(mp, beer);
+
+                    Dictionary<string, object> dict = b.getAttributes();
+
+                    foreach (KeyValuePair<string, object> obj in dict)
+                    {
+                        graphic.Attributes.Add(obj);
+                    }
+
                     overlay.Graphics.Add(graphic);
                 }
             }
