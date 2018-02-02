@@ -1,8 +1,11 @@
-﻿using Esri.ArcGISRuntime.Geometry;
+﻿using Esri.ArcGISRuntime.Data;
+using Esri.ArcGISRuntime.Geometry;
 using Esri.ArcGISRuntime.Mapping;
 using Esri.ArcGISRuntime.Symbology;
 using Esri.ArcGISRuntime.UI;
 using Esri.ArcGISRuntime.Xamarin.Forms;
+using Esri.ArcGISRuntime.Location;
+using Newtonsoft.Json;
 //using Esri.ArcGISRuntime.UI.Controls;
 using System;
 using System.Collections.Generic;
@@ -28,6 +31,17 @@ namespace ArcGISApp
             Initialize();
             basemapSelector = new BasemapSelector(MyMapView);
             layerLoad(MyMapView);
+
+            MyMapView.GeoViewTapped += OnMapViewTapped;
+
+            // Starts location display with auto pan mode set to Off
+            MyMapView.LocationDisplay.AutoPanMode = LocationDisplayAutoPanMode.Off;
+
+            //TODO Remove this IsStarted check https://github.com/Esri/arcgis-runtime-samples-xamarin/issues/182
+            if (!MyMapView.LocationDisplay.IsEnabled)
+            {
+                MyMapView.LocationDisplay.IsEnabled = true;
+            }
         }
         // String array to store titles for the viewpoints specified above.
         private string[] titles = new string[]
@@ -47,28 +61,6 @@ namespace ArcGISApp
             // Assign the map to the MapView
             //MyMapView.Map = myMap;
 
-            // define the buoy locations
-            var wgs84 = SpatialReferences.Wgs84;
-            // Create initial map location and reuse the location for graphic
-            MapPoint centralLocation = new MapPoint(-98.5795, 39.8283, wgs84);
-            // Create overlay to where graphics are shown
-            GraphicsOverlay overlay = new GraphicsOverlay();
-
-            // Add created overlay to the MapView
-            MyMapView.GraphicsOverlays.Add(overlay);
-
-            // Create a simple marker symbol
-            SimpleMarkerSymbol simpleSymbol = new SimpleMarkerSymbol()
-            {
-                Color = Colors.Red,
-                //Color = Xamarin.Forms.Color.Aqua;
-                Size = 50,
-                Style = SimpleMarkerSymbolStyle.Circle
-            };
-
-            // Add a new graphic with a central point that was created earlier
-            Graphic graphicWithSymbol = new Graphic(centralLocation, simpleSymbol);
-            overlay.Graphics.Add(graphicWithSymbol);
         }
 
         public async void layerLoad(MapView myMapView)
@@ -111,6 +103,32 @@ namespace ArcGISApp
 
                     overlay.Graphics.Add(graphic);
                 }
+            }
+        }
+
+        private async void OnMapViewTapped(object sender, Esri.ArcGISRuntime.Xamarin.Forms.GeoViewInputEventArgs e)
+        {
+            var tolerance = 10d; // Use larger tolerance for touch
+            var maximumResults = 1; // Only return one graphic  
+            var onlyReturnPopups = false; // Don't return only popups
+
+            // Use the following method to identify graphics in a specific graphics overlay
+            IdentifyGraphicsOverlayResult identifyResults = await MyMapView.IdentifyGraphicsOverlayAsync(
+                 overlay,
+                 e.Position,
+                 tolerance,
+                 onlyReturnPopups,
+                 maximumResults
+                 );
+
+            // Check if we got results
+            if (identifyResults.Graphics.Count > 0)
+            {
+                // Make sure that the UI changes are done in the UI thread
+                Device.BeginInvokeOnMainThread(async () => {
+                    var json = JsonConvert.SerializeObject(identifyResults.Graphics[0].Attributes, Formatting.Indented);
+                    await DisplayAlert("", json, "OK");
+                });
             }
         }
 

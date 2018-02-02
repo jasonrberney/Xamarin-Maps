@@ -16,6 +16,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)ViewModel\DataLoader\JSONLoader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModel\Map\AddGraphics.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModel\Map\BasemapSelector.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -26,6 +27,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="$(MSBuildThisFileDirectory)Data\bars_in_WA.json" />
-    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Data\beer_mug.png" />
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)images\beer_mug.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)images\" />
   </ItemGroup>
 </Project>
